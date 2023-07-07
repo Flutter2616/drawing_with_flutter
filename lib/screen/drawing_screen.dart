@@ -22,38 +22,33 @@ class _DrawingscreenState extends State<Drawingscreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        key: key,
-        floatingActionButton: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FloatingActionButton.small(
-              onPressed: () {},
-              child: Icon(Icons.undo, color: Colors.white),
-              backgroundColor: Colors.indigo,
-            ),
-            SizedBox(width: 15),
-            FloatingActionButton.small(
-                onPressed: () {},
-                child: Icon(Icons.redo, color: Colors.white),
-                backgroundColor: Colors.indigo)
-          ],
+        floatingActionButton: FloatingActionButton.small(
+          onPressed: () {
+            setState(() {
+              controller.points.clear();
+              Customdrawing draw=Customdrawing(controller.points);
+              draw.clear();
+            });
+          },
+          child: Icon(Icons.close, color: Colors.white),
+          backgroundColor: Colors.indigo,
         ),
         body: Center(
           child: Stack(
             children: [
               GestureDetector(
                 onPanStart: (details) {
-                 setState(() {
-                   RenderBox? renderBox =
-                   context.findRenderObject() as RenderBox?;
-                   controller.points.add(Drawingmodal(
-                       Paint()
-                         ..color = controller.currentcolor.value
-                         ..strokeCap = StrokeCap.round
-                         ..strokeWidth = controller.slider.value
-                         ..isAntiAlias = true,
-                       renderBox!.globalToLocal(details.globalPosition)));
-                 });
+                  setState(() {
+                    RenderBox? renderBox =
+                        context.findRenderObject() as RenderBox?;
+                    controller.points.add(Drawingmodal(
+                        Paint()
+                          ..color = controller.currentcolor.value
+                          ..strokeCap = StrokeCap.round
+                          ..strokeWidth = controller.slider.value
+                          ..isAntiAlias = true,
+                        renderBox!.globalToLocal(details.globalPosition)));
+                  });
                 },
                 onPanEnd: (details) {
                   setState(() {
@@ -61,17 +56,17 @@ class _DrawingscreenState extends State<Drawingscreen> {
                   });
                 },
                 onPanUpdate: (details) {
-                 setState(() {
-                   RenderBox? renderBox =
-                   context.findRenderObject() as RenderBox?;
-                   controller.points.add(Drawingmodal(
-                       Paint()
-                         ..color = controller.currentcolor.value
-                         ..strokeCap = StrokeCap.round
-                         ..strokeWidth = controller.slider.value
-                         ..isAntiAlias = true,
-                       renderBox!.globalToLocal(details.globalPosition)));
-                 });
+                  setState(() {
+                    RenderBox? renderBox =
+                        context.findRenderObject() as RenderBox?;
+                    controller.points.add(Drawingmodal(
+                        Paint()
+                          ..color = controller.currentcolor.value
+                          ..strokeCap = StrokeCap.square
+                          ..strokeWidth = controller.slider.value
+                          ..isAntiAlias = true,
+                        renderBox!.globalToLocal(details.globalPosition)));
+                  });
                 },
                 child: Container(
                   width: 100.w,
@@ -82,24 +77,32 @@ class _DrawingscreenState extends State<Drawingscreen> {
                 ),
               ),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                        children: controller.colorlist
-                            .map((e) => Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: InkWell(
-                                      onTap: () {
-                                        controller.currentcolor.value = e;
-                                      },
-                                      child: CircleAvatar(
-                                        backgroundColor: e,
-                                        radius: 10.sp,
-                                      )),
-                                ))
-                            .toList()),
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    height: 6.h,
+                    width: 90.w,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.blue.shade50),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: controller.colorlist
+                              .map((e) => Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: InkWell(
+                                        onTap: () {
+                                          controller.currentcolor.value = e;
+                                        },
+                                        child: CircleAvatar(
+                                          backgroundColor: e,
+                                          radius: 10.sp,
+                                        )),
+                                  ))
+                              .toList()),
+                    ),
                   ),
                   SizedBox(height: 10),
                   Row(
@@ -111,7 +114,7 @@ class _DrawingscreenState extends State<Drawingscreen> {
                         child: Obx(
                           () => SfSlider.vertical(
                             min: 0,
-                            activeColor: Colors.indigo,
+                            activeColor: controller.currentcolor.value,
                             inactiveColor: Colors.indigo.shade100,
                             max: 20,
                             value: controller.slider.value,
@@ -147,6 +150,12 @@ class Customdrawing extends CustomPainter {
 
   List<Offset> offlist = [];
 
+  void clear()
+  {
+    pointsList.clear();
+    offlist.clear();
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     for (int i = 0; i < (pointsList.length - 1); i++) {
@@ -169,51 +178,4 @@ class Customdrawing extends CustomPainter {
   }
 }
 
-// Get.dialog(AlertDialog(
-// title: Text("Pick color",
-// style: TextStyle(
-// color: Colors.black,
-// fontSize: 15.sp,
-// fontWeight: FontWeight.w400)),
-// actions: [
-// TextButton(
-// onPressed: () {
-// controller.currentcolor.value =
-// controller.pickcolor.value;
-// // controller.convertcolor();
-// Get.back();
-// },
-// child: Text(
-// "Got it",
-// style: TextStyle(
-// color: Colors.blue,
-// fontSize: 12.sp,
-// fontWeight: FontWeight.w500),
-// ))
-// ],
-// content: SingleChildScrollView(
-// child: ColorPicker(
-// colorHistory: [
-// Colors.black,
-// Colors.amber,
-// Colors.red,
-// Colors.pink,
-// Colors.purple,
-// Colors.teal,
-// Colors.blue,
-// Colors.grey,
-// Colors.white,
-// Colors.green,
-// Colors.indigo,
-// Colors.tealAccent,
-// Colors.orange,
-// Colors.lime
-// ],
-// pickerColor: controller.pickcolor.value,
-// onColorChanged: (value) {
-// // controller.changecolor(value);
-// controller.pickcolor.value = value;
-// },
-// ),
-// ),
-// ));
+
